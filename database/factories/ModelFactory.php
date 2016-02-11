@@ -15,7 +15,15 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
     return [
         'name' => $faker->name,
         'email' => $faker->email,
-        'password' => bcrypt(str_random(10)),
+        'password' => bcrypt('Qw3rt!'),
+        'preferred_daily_hours' => rand(1, 24),
         'remember_token' => str_random(10),
+    ];
+});
+$factory->define(App\TimeSheet::class, function (Faker\Generator $faker) {
+    return [
+        'date' => $faker->dateTimeThisYear,
+        'hours' => rand(1, 24),
+        'description' => $faker->paragraph(5),
     ];
 });
