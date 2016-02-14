@@ -11,7 +11,7 @@
 |
 */
 
-$factory->define(App\User::class, function (Faker\Generator $faker) {
+$factory->define(\App\DataModels\User\User::class, function (Faker\Generator $faker) {
     return [
         'name' => $faker->name,
         'email' => $faker->email,
@@ -20,9 +20,9 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
         'remember_token' => str_random(10),
     ];
 });
-$factory->define(App\TimeSheet::class, function (Faker\Generator $faker) {
+$factory->define(\App\DataModels\TimeSheet\TimeSheet::class, function (Faker\Generator $faker) {
     return [
-        'date' => $faker->dateTimeThisYear,
+        'date' => $faker->dateTimeThisYear->format('Y-m-d'),
         'hours' => rand(1, 24),
         'description' => $faker->paragraph(5),
     ];

@@ -1,5 +1,6 @@
-<?php namespace App;
+<?php namespace App\DataModels\TimeSheet;
 
+use App\DataModels\User\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
@@ -42,7 +43,7 @@ class TimeSheet extends Model
      *
      * @var array
      */
-    protected $dates = ['date'];
+    protected $dates = [];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

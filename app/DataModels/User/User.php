@@ -1,5 +1,6 @@
-<?php namespace App;
+<?php namespace App\DataModels\User;
 
+use App\DataModels\TimeSheet\TimeSheet;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Auth\User as Authenticatable;
