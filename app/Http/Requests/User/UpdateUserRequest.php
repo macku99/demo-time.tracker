@@ -22,8 +22,8 @@ class UpdateUserRequest extends Request
     {
         return [
             'name'     => 'bail|required|max:255',
-            'email'    => 'bail|required|email|max:255|unique:users,email,' . $this->get('id'),
-            'password' => 'bail|required|confirmed|min:6',
+            'email'    => 'bail|required|email|max:255|unique:users,email,' . $this->route('users'),
+            'password' => 'bail|confirmed|min:6',
         ];
     }
 

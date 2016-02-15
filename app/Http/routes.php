@@ -15,7 +15,7 @@ Route::group(['middleware' => 'web'], function () {
     });
     Route::get('home', 'PageController@home');
     Route::get('users', 'PageController@users');
-    Route::get('timesheets', 'PageController@timesheets');
+    Route::get('users/{users}/timesheets', 'PageController@timesheets');
     Route::get('account', 'PageController@account');
 });
 

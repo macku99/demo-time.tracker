@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers;
 
+use App\DataModels\User\User;
 use App\Http\Requests;
 use Illuminate\Http\Response;
 
@@ -37,11 +38,15 @@ class PageController extends Controller
     /**
      * Show the application timesheets page.
      *
+     * @param  User $users
      * @return Response
      */
-    public function timesheets()
+    public function timesheets(User $users)
     {
-        return view('timesheets');
+        $userId = $users->id;
+        $userName = $users->name;
+
+        return view('timesheets', compact('userId', 'userName'));
     }
 
     /**

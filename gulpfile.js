@@ -1,4 +1,5 @@
 var elixir = require('laravel-elixir');
+require('laravel-elixir-vueify');
 
 /*
  |--------------------------------------------------------------------------
@@ -11,6 +12,8 @@ var elixir = require('laravel-elixir');
  |
  */
 
-elixir(function(mix) {
-    mix.sass('app.scss');
+elixir(function (mix) {
+	mix.browserify('app.js');
+	mix.sass('app.scss');
+	mix.version(['public/css/app.css', 'public/js/app.js']);
 });

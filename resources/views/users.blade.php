@@ -1,17 +1,15 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="row">
-        <div class="col-md-10 col-md-offset-1">
-            <div class="panel panel-default">
-                <div class="panel-heading">Users</div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
 
-                <div class="panel-body">
-                    Users
-                </div>
+                @include('partials._page-header', ['pageTitle' => 'Users', 'pageSubTitle' => null])
+
+                <users-list></users-list>
+
             </div>
         </div>
     </div>
-</div>
 @endsection
