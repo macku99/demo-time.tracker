@@ -23,7 +23,7 @@ $factory->define(\App\DataModels\User\User::class, function (Faker\Generator $fa
 $factory->define(\App\DataModels\TimeSheet\TimeSheet::class, function (Faker\Generator $faker) {
     return [
         'date' => $faker->dateTimeThisYear->format('Y-m-d'),
-        'hours' => rand(1, 24),
+        'hours' => rand(1, 10),
         'description' => $faker->paragraph(5),
     ];
 });

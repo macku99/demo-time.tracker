@@ -44,7 +44,7 @@ class CreateTimeSheetTest extends TestCase
         ]);
 
         $this->dispatch(
-            new CreateTimeSheet($user->id, '2016-01-01', 10, 'some description')
+            new CreateTimeSheet($user->id, '2016-01-01', 5, 'some description')
         );
     }
 

@@ -34,17 +34,17 @@
 
 			// subscribe to the USER_CREATED event
 			when(UsersStore.USER_CREATED).subscribe(() => {
-				this.success('The user has been successfully created.');
+				Helpers.success('The user has been successfully created.');
 			});
 
 			// subscribe to the USER_UPDATED event
 			when(UsersStore.USER_UPDATED).subscribe(() => {
-				this.success('The user has been successfully updated.');
+				Helpers.success('The user has been successfully updated.');
 			});
 
 			// subscribe to the USER_UPDATED event
 			when(UsersStore.USER_REMOVED).subscribe(() => {
-				this.success('The user has been successfully removed.');
+				Helpers.success('The user has been successfully removed.');
 			});
 		},
 
@@ -83,17 +83,6 @@
 			whenPaginationPageHasChanged(page) {
 				// fetch the users for the page
 				UsersStore.all(page);
-			},
-
-			success(message) {
-				sweetalert({
-					title: 'Congratulations!',
-					text: message,
-					type: 'success',
-					timer: 3000,
-					showConfirmButton: false,
-					allowOutsideClick: true
-				});
 			}
 		},
 

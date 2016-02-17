@@ -53,4 +53,22 @@ class TimeSheet extends Model
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * @param  string $value
+     * @return string
+     */
+    public function getDateAttribute($value)
+    {
+        return (new Carbon($value))->format('F jS Y');
+    }
+
+    /**
+     * @param  string $value
+     * @return string
+     */
+    public function setDateAttribute($value)
+    {
+        $this->attributes['date'] = (new Carbon($value))->toDateString();
+    }
+
 }

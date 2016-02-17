@@ -4,6 +4,8 @@ use App\DataModels\TimeSheet\Events\TimeSheetUpdated;
 use App\DataModels\TimeSheet\TimeSheet;
 use App\DataModels\TimeSheet\UserIsAllowedToWorkOnly24HoursPerDaySpecification;
 use App\Jobs\Job;
+use Assert\Assertion;
+use Carbon\Carbon;
 
 /**
  * UpdateTimeSheet Job.
@@ -50,7 +52,7 @@ class UpdateTimeSheet extends Job
     {
         $this->id = $id;
         $this->userId = $userId;
-        $this->date = $date;
+        $this->date = (new Carbon($date))->toDateString();
         $this->hours = $hours;
         $this->description = $description;
     }

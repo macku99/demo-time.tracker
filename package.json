@@ -7,6 +7,7 @@
     "bootstrap-sass": "^3.0.0",
     "laravel-elixir": "^4.0.0",
     "laravel-elixir-vueify": "^1.0.2",
+    "moment": "^2.11.2",
     "promise": "^7.1.1",
     "radio": "^0.2.0",
     "sweetalert": "^1.1.3",

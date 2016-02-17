@@ -19,7 +19,12 @@
 			return {
 				show: false,
 				user: null,
-				userForm: this.resetFormData()
+				userForm: this.resetFormData(),
+				dataProviders: {
+					hours: _.range(24).map((value) => {
+						return value + 1;
+					})
+				}
 			};
 		},
 
@@ -28,16 +33,26 @@
 				.subscribe(user => {
 					this.$set('user', user);
 					this.$set('show', true);
-					this.$set('userForm', this.resetFormData());
+					if (user) {
+						this.$set('userForm', new Form({
+							name: user.name,
+							email: user.email,
+							password: null,
+							password_confirmation: null,
+							preferredDailyHours: user.preferredDailyHours
+						}));
+					} else {
+						this.$set('userForm', this.resetFormData());
+					}
 				});
 		},
 
 		methods: {
 			createOrUpdateUser() {
-				if (this.type == 'create') {
-					return this.createUser();
+				if (this.type == 'update') {
+					return this.updateUser();
 				} else {
-					return this.updateTimeSheet();
+					return this.createUser();
 				}
 			},
 			createUser() {
@@ -45,21 +60,17 @@
 				this.userForm.send(createUserPromise.then(() => {
 					// fetch the users
 					UsersStore.all();
-
-					this.show = false;
-					this.user = null;
-					this.userForm = this.resetFormData();
+					// close modal
+					this.close();
 				}));
 			},
 			updateUser() {
-				var updateUserPromise = UsersStore.updateTimeSheet(this.user, this.userForm.data);
+				var updateUserPromise = UsersStore.updateUser(this.user, this.userForm.data);
 				this.userForm.send(updateUserPromise.then(() => {
 					// fetch the users
 					UsersStore.all();
-
-					this.show = false;
-					this.user = null;
-					this.userForm = this.resetFormData();
+					// close modal
+					this.close();
 				}));
 			},
 
@@ -68,13 +79,15 @@
 					name: null,
 					email: null,
 					password: null,
-					password_confirmation: null
+					password_confirmation: null,
+					preferredDailyHours: 8
 				});
 			},
 
 			close() {
 				this.show = false;
 				this.user = null;
+				this.userForm = this.resetFormData();
 			}
 		},
 
@@ -143,6 +156,23 @@
 					       v-model="formData.password_confirmation"
 					       placeholder="same like password"
 					>
+				</div>
+			</div>
+			<div class="form-group" :class="{ 'has-error': userForm.hasError('preferredDailyHours') == true }">
+				<label for="preferredDailyHours" class="col-md-4 control-label">Preferred Daily Hours</label>
+
+				<div class="col-md-3">
+					<select id="preferredDailyHours" name="preferredDailyHours"
+					        class="form-control"
+					        v-model="formData.preferredDailyHours"
+					>
+						<option v-for="hour in dataProviders.hours"
+						        :value="hour"
+						>
+							{{ hour }} {{ hour | pluralize 'hour' }}
+						</option>
+					</select>
+					<form-error-block :form="userForm" attribute="preferredDailyHours"></form-error-block>
 				</div>
 			</div>
 		</form>

@@ -35,17 +35,24 @@ class UpdateUser extends Job
     protected $password;
 
     /**
+     * @var int
+     */
+    protected $preferredDailyHours;
+
+    /**
      * @param int    $id
      * @param string $name
      * @param string $email
      * @param string $password
+     * @param int    $preferredDailyHours
      */
-    public function __construct($id, $name, $email, $password = null)
+    public function __construct($id, $name, $email, $password = null, $preferredDailyHours = null)
     {
         $this->id = $id;
         $this->name = $name;
         $this->email = $email;
         $this->password = $password;
+        $this->preferredDailyHours = $preferredDailyHours;
     }
 
     /**
@@ -60,7 +67,10 @@ class UpdateUser extends Job
         $user->name = $this->name;
         $user->email = $this->email;
         if ( ! is_null($this->password)) {
-            $user->password = $this->password;
+            $user->password = bcrypt($this->password);
+        }
+        if ( ! is_null($this->preferredDailyHours)) {
+            $user->preferred_daily_hours = $this->preferredDailyHours;
         }
 
         $user->save();

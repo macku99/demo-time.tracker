@@ -19,6 +19,9 @@
 				columns: [
 					'Date', 'Hours', 'Description'
 				],
+				filters: {
+					dateRange: null
+				},
 				modal: {
 					title: 'Create TimeSheet',
 					type: 'create'
@@ -40,17 +43,17 @@
 
 			// subscribe to the USER_CREATED event
 			when(TimeSheetsStore.TIMESHEET_CREATED).subscribe(() => {
-				this.success('The timesheet has been successfully created.');
+				Helpers.success('The timesheet has been successfully created.');
 			});
 
 			// subscribe to the USER_UPDATED event
 			when(TimeSheetsStore.TIMESHEET_UPDATED).subscribe(() => {
-				this.success('The timesheet has been successfully updated.');
+				Helpers.success('The timesheet has been successfully updated.');
 			});
 
 			// subscribe to the USER_UPDATED event
 			when(TimeSheetsStore.TIMESHEET_REMOVED).subscribe(() => {
-				this.success('The timesheet has been successfully removed.');
+				Helpers.success('The timesheet has been successfully removed.');
 			});
 		},
 
@@ -89,17 +92,6 @@
 			whenPaginationPageHasChanged(page) {
 				// fetch the user's timesheets for the page
 				TimeSheetsStore.allOfUser(this.userId, page);
-			},
-
-			success(message) {
-				sweetalert({
-					title: 'Congratulations!',
-					text: message,
-					type: 'success',
-					timer: 3000,
-					showConfirmButton: false,
-					allowOutsideClick: true
-				});
 			}
 		},
 
@@ -121,8 +113,15 @@
 				Create Timesheet
 			</button>
 		</div>
-		<div class="col-md-3 col-md-offset-3">
-			<input type="text" value="01/01/15 - 01/08/15" class="form-control" data-provide="datepicker">
+		<div class="col-md-4 col-md-offset-2">
+			<input
+				type="text"
+				class="form-control"
+				name="daterange"
+				placeholder="filter by date range"
+				v-model="filters.dateRange"
+				:value="filters.dateRange"
+			>
 		</div>
 	</div>
 
@@ -136,7 +135,7 @@
 		<tbody>
 		<tr v-for="timesheet in timesheets">
 			<th class="col-md-2" scope="row">{{ timesheet.date }}</th>
-			<td class="col-md-2">{{ timesheet.hours }}</td>
+			<td class="col-md-2">{{ timesheet.hours }} {{ timesheet.hours | pluralize 'hour' }}</td>
 			<td class="col-md-6">{{ timesheet.description }}</td>
 			<td class="col-md-2 text-right">
 				<div class="btn-group">
@@ -152,6 +151,9 @@
 					</ul>
 				</div>
 			</td>
+		</tr>
+		<tr v-if="!timesheets.length">
+			<td colspan="4" class="text-center">There are no timesheets recorded.</td>
 		</tr>
 		</tbody>
 	</table>

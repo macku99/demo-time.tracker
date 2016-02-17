@@ -11,6 +11,7 @@ use App\Http\Requests\Request;
  * @property string $name
  * @property string $email
  * @property string $password
+ * @property int    $preferredDailyHours
  */
 class UpdateUserRequest extends Request
 {

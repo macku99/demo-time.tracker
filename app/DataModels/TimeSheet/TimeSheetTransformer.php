@@ -27,7 +27,7 @@ class TimeSheetTransformer extends TransformerAbstract
             'id'          => (int) $timesheet->id,
             'date'        => $timesheet->date,
             'description' => trim($timesheet->description),
-            'hours'       => (int) $timesheet->hours,
+            'hours'       => (float) number_format($timesheet->hours, 1),
             'createdAt'   => $timesheet->created_at->diffForHumans(),
             'updatedAt'   => $timesheet->updated_at->diffForHumans(),
         ];

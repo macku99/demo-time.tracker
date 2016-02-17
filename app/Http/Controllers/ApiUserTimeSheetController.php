@@ -20,7 +20,7 @@ class ApiUserTimeSheetController extends ApiController
      */
     public function index(User $users)
     {
-        $timeSheets = $users->timesheets()->paginate(20);
+        $timeSheets = $users->timesheets()->orderBy('date', 'DESC')->paginate(20);
 
         return $this->respondWithCollection($timeSheets, new TimeSheetTransformer);
     }
@@ -102,7 +102,7 @@ class ApiUserTimeSheetController extends ApiController
     {
         return [
             'date'        => 'bail|required|date',
-            'hours'       => 'bail|required|numeric|min:1|max:24',
+            'hours'       => 'bail|required|numeric|min:0.5|max:24',
             'description' => 'required',
         ];
     }

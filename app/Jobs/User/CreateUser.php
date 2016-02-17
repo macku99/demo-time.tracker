@@ -30,15 +30,22 @@ class CreateUser extends Job
     protected $password;
 
     /**
+     * @var int
+     */
+    private $preferredDailyHours;
+
+    /**
      * @param string $name
      * @param string $email
      * @param string $password
+     * @param int    $preferredDailyHours
      */
-    public function __construct($name, $email, $password)
+    public function __construct($name, $email, $password, $preferredDailyHours = null)
     {
         $this->name = $name;
         $this->email = $email;
         $this->password = $password;
+        $this->preferredDailyHours = $preferredDailyHours;
     }
 
     /**
@@ -52,7 +59,10 @@ class CreateUser extends Job
 
         $user->name = $this->name;
         $user->email = $this->email;
-        $user->password = $this->password;
+        $user->password = bcrypt($this->password);
+        if ( ! is_null($this->preferredDailyHours)) {
+            $user->preferred_daily_hours = $this->preferredDailyHours;
+        }
 
         $user->save();
 

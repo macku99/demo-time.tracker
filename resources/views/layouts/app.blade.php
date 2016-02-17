@@ -15,6 +15,8 @@
     <!-- Styles -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css" rel="stylesheet">
+    <link href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" rel="stylesheet">
+    <link href="//select2.github.io/select2-bootstrap-theme/css/select2-bootstrap.css" rel="stylesheet">
     <link href="{{ elixir('css/app.css') }}" rel="stylesheet">
 </head>
 <body id="app-layout">
@@ -40,7 +42,10 @@
         <div class="collapse navbar-collapse" id="app-navbar-collapse">
             <!-- Left Side Of Navbar -->
             <ul class="nav navbar-nav">
-                <li><a href="{{ url('/users') }}">Users</a></li>
+                @unless (Auth::guest())
+                    <li><a href="{{ url('/users') }}">Users</a></li>
+                    <li><a href="{{ url('/users/' . Auth::user()->id . '/timesheets') }}">My Timesheets</a></li>
+                @endunless
             </ul>
 
             <!-- Right Side Of Navbar -->
@@ -72,6 +77,9 @@
 <!-- JavaScripts -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+<script type="text/javascript" src="http://cdn.bootcss.com/select2/4.0.0/js/select2.js"></script>
 <script src="{{ elixir('js/app.js') }}"></script>
 </body>
 </html>

@@ -45,7 +45,7 @@ class ApiUsersController extends ApiController
     public function store(CreateUserRequest $request)
     {
         $this->dispatch(
-            new CreateUser($request->name, $request->email, $request->password)
+            new CreateUser($request->name, $request->email, $request->password, $request->preferredDailyHours)
         );
 
         return $this->respondCreated();
@@ -61,7 +61,7 @@ class ApiUsersController extends ApiController
     public function update(UpdateUserRequest $request, $userId)
     {
         $this->dispatch(
-            new UpdateUser($userId, $request->name, $request->email, $request->password)
+            new UpdateUser($userId, $request->name, $request->email, $request->password, $request->preferredDailyHours)
         );
 
         return $this->respondAccepted();

@@ -4,6 +4,7 @@ use App\DataModels\TimeSheet\Events\TimeSheetCreated;
 use App\DataModels\TimeSheet\TimeSheet;
 use App\DataModels\TimeSheet\UserIsAllowedToWorkOnly24HoursPerDaySpecification;
 use App\Jobs\Job;
+use Carbon\Carbon;
 
 /**
  * CreateTimeSheet Job.
@@ -43,7 +44,7 @@ class CreateTimeSheet extends Job
     public function __construct($userId, $date, $hours, $description)
     {
         $this->userId = $userId;
-        $this->date = $date;
+        $this->date = (new Carbon($date))->toDateString();
         $this->hours = $hours;
         $this->description = $description;
     }
