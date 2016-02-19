@@ -4,18 +4,18 @@ use App\DataModels\User\User;
 use Illuminate\Queue\SerializesModels;
 
 /**
- * UserUpdated Event.
+ * UserPreferencesUpdated Event.
  *
  * @author  macku99
  * @version 1.0
  */
-class UserUpdated
+class UserPreferencesUpdated
 {
 
     use SerializesModels;
 
     /**
-     * The user being updated.
+     * The user that has preferences updated.
      *
      * @var User
      */

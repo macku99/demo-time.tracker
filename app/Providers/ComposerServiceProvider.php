@@ -17,7 +17,11 @@ class ComposerServiceProvider extends ServiceProvider
             $loggedInUser = request()->user();
             $view->with('userIsLoggedIn', ! is_null($loggedInUser));
             $view->with('userIsGuest', is_null($loggedInUser));
-            $view->with('loggedInUser', $loggedInUser);
+            $view->with('loggedInUserId', (! is_null($loggedInUser) ? $loggedInUser->id : null));
+            $view->with('loggedInUserName', (! is_null($loggedInUser) ? $loggedInUser->name : null));
+            $view->with('loggedInUserPreferredDailyHours',
+                (! is_null($loggedInUser) ? $loggedInUser->preferred_daily_hours : null)
+            );
             $view->with('loggedInUserIsAdmin', (! is_null($loggedInUser) ? $loggedInUser->isAdmin() : null));
         });
     }

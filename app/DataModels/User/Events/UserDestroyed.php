@@ -10,7 +10,7 @@ class UserDestroyed
 {
 
     /**
-     * The user id being destroyed.
+     * The id of the user being destroyed.
      *
      * @var int
      */

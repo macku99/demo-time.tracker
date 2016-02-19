@@ -22895,6 +22895,15 @@ var UsersStore = require('../stores/UsersStore');
 
 exports.default = {
 	props: {
+		userId: {
+			type: Number,
+			required: true
+		},
+		preferredDailyHours: {
+			type: Number,
+			required: true,
+			default: null
+		},
 		title: {
 			type: String,
 			default: ''
@@ -22904,7 +22913,6 @@ exports.default = {
 	data: function data() {
 		return {
 			show: false,
-			user: null,
 			preferencesForm: this.resetFormData(),
 			dataProviders: {
 				hours: _.range(24).map(function (value) {
@@ -22916,12 +22924,11 @@ exports.default = {
 	ready: function ready() {
 		var _this = this;
 
-		when('show.user.preferences.modal').subscribe(function (user) {
-			_this.$set('user', user);
+		when('show.user.preferences.modal').subscribe(function () {
 			_this.$set('show', true);
-			if (user) {
+			if (_this.preferredDailyHours) {
 				_this.$set('preferencesForm', new Form({
-					preferredDailyHours: user.preferredDailyHours
+					preferredDailyHours: _this.preferredDailyHours
 				}));
 			} else {
 				_this.$set('preferencesForm', _this.resetFormData());
@@ -22934,9 +22941,12 @@ exports.default = {
 		updateUserPreferences: function updateUserPreferences() {
 			var _this2 = this;
 
-			this.preferencesForm.send(UsersStore.updateUserPreferences(this.user, this.preferencesForm.data).then(function () {
+			this.preferencesForm.send(UsersStore.updateUserPreferences(this.userId, this.preferencesForm.data).then(function () {
 				// close modal
 				_this2.close();
+
+				// cache the preferredDailyHours
+				_this2.preferredDailyHours = _this2.preferencesForm.data.preferredDailyHours;
 			}));
 		},
 		resetFormData: function resetFormData() {
@@ -22946,8 +22956,7 @@ exports.default = {
 		},
 		close: function close() {
 			this.show = false;
-			this.user = null;
-			this.preferencesForm = this.resetFormData();
+			//this.preferencesForm = this.resetFormData();
 		}
 	},
 
@@ -23541,6 +23550,7 @@ var UsersStore = {
 	USER_CREATED: 'USER_CREATED',
 	USER_UPDATED: 'USER_UPDATED',
 	USER_REMOVED: 'USER_REMOVED',
+	USER_PREFERENCES_UPDATED: 'USER_PREFERENCES_UPDATED',
 
 	all: function all(page) {
 		var _this = this;
@@ -23594,6 +23604,19 @@ var UsersStore = {
 		return new Promise(function (resolve, reject) {
 			Vue.http.delete('/api/users/' + user.id).then(function (response) {
 				when(_this5.USER_REMOVED).broadcast(response.data);
+
+				resolve(response.data);
+			}, function (response) {
+				reject(response.data);
+			});
+		});
+	},
+	updateUserPreferences: function updateUserPreferences(userId, data) {
+		var _this6 = this;
+
+		return new Promise(function (resolve, reject) {
+			Vue.http.put('/api/users/preferences/' + userId, data).then(function (response) {
+				when(_this6.USER_PREFERENCES_UPDATED).broadcast(response.data);
 
 				resolve(response.data);
 			}, function (response) {

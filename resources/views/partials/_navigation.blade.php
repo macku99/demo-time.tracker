@@ -8,7 +8,7 @@
                 </li>
             @endif
             <li>
-                <a href="{{ url('/users/' . $loggedInUser->id . '/timesheets') }}">
+                <a href="{{ url('/users/' . $loggedInUserId . '/timesheets') }}">
                     <i class="fa fa-btn fa-calendar"></i>My Timesheets
                 </a>
             </li>
@@ -29,7 +29,7 @@
         @else
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                    {{ $loggedInUser->name }} <span class="caret"></span>
+                    {{ $loggedInUserName }} <span class="caret"></span>
                 </a>
 
                 <ul class="dropdown-menu" role="menu">
@@ -40,4 +40,8 @@
     </ul>
 </div>
 
-<modal-user-preferences title="Preferences"></modal-user-preferences>
+<modal-user-preferences
+        title="Preferences"
+        :user-id="{{ $loggedInUserId }}"
+        :preferred-daily-hours="{{ (int) $loggedInUserPreferredDailyHours }}"
+></modal-user-preferences>

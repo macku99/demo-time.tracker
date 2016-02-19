@@ -4,6 +4,7 @@ var UsersStore = {
 	USER_CREATED: 'USER_CREATED',
 	USER_UPDATED: 'USER_UPDATED',
 	USER_REMOVED: 'USER_REMOVED',
+	USER_PREFERENCES_UPDATED: 'USER_PREFERENCES_UPDATED',
 
 	all(page) {
 		Vue.http.get('/api/users' + (page ? '?page=' + page : ''))
@@ -73,6 +74,23 @@ var UsersStore = {
 				.then(
 					response => {
 						when(this.USER_REMOVED)
+							.broadcast(response.data);
+
+						resolve(response.data);
+					},
+					response => {
+						reject(response.data);
+					}
+				);
+		});
+	},
+
+	updateUserPreferences(userId, data) {
+		return new Promise((resolve, reject) => {
+			Vue.http.put('/api/users/preferences/' + userId, data)
+				.then(
+					response => {
+						when(this.USER_PREFERENCES_UPDATED)
 							.broadcast(response.data);
 
 						resolve(response.data);

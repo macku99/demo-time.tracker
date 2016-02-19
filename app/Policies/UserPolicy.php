@@ -45,7 +45,7 @@ class UserPolicy
      * @param  User $anotherUser
      * @return bool
      */
-    public function update(User $user, user $anotherUser)
+    public function update(User $user, User $anotherUser)
     {
         return $user->id == $anotherUser->id;
     }
@@ -63,6 +63,18 @@ class UserPolicy
     }
 
     /**
+     * Determine if the given user can update user preferences.
+     *
+     * @param  User $user
+     * @param  User $anotherUser
+     * @return bool
+     */
+    public function updateUserPreferences(User $user, User $anotherUser)
+    {
+        return $user->id == $anotherUser->id;
+    }
+
+    /**
      * The admin users have all abilities.
      *
      * @param  User   $user
@@ -71,7 +83,7 @@ class UserPolicy
      */
     public function before(User $user, $ability)
     {
-        if ($user->isAdmin()) {
+        if ($user->isAdmin() && ! in_array($ability, ['update-user-preferences'])) {
             return true;
         }
     }

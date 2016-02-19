@@ -4,6 +4,15 @@
 
 	export default {
 		props: {
+			userId: {
+				type: Number,
+				required: true
+			},
+			preferredDailyHours: {
+				type: Number,
+				required: true,
+				default: null
+			},
 			title: {
 				type: String,
 				default: ''
@@ -13,7 +22,6 @@
 		data() {
 			return {
 				show: false,
-				user: null,
 				preferencesForm: this.resetFormData(),
 				dataProviders: {
 					hours: _.range(24).map((value) => {
@@ -25,12 +33,11 @@
 
 		ready() {
 			when('show.user.preferences.modal')
-				.subscribe(user => {
-					this.$set('user', user);
+				.subscribe(() => {
 					this.$set('show', true);
-					if (user) {
+					if (this.preferredDailyHours) {
 						this.$set('preferencesForm', new Form({
-							preferredDailyHours: user.preferredDailyHours
+							preferredDailyHours: this.preferredDailyHours
 						}));
 					} else {
 						this.$set('preferencesForm', this.resetFormData());
@@ -41,10 +48,13 @@
 		methods: {
 			updateUserPreferences() {
 				this.preferencesForm.send(
-					UsersStore.updateUserPreferences(this.user, this.preferencesForm.data)
+					UsersStore.updateUserPreferences(this.userId, this.preferencesForm.data)
 						.then(() => {
 							// close modal
 							this.close();
+
+							// cache the preferredDailyHours
+							this.preferredDailyHours = this.preferencesForm.data.preferredDailyHours
 						}));
 			},
 
@@ -56,8 +66,7 @@
 
 			close() {
 				this.show = false;
-				this.user = null;
-				this.preferencesForm = this.resetFormData();
+				//this.preferencesForm = this.resetFormData();
 			}
 		},
 
