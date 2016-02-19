@@ -8,7 +8,18 @@ Vue.component('users-list', require('./components/UsersList.vue'));
 Vue.component('timesheets-list', require('./components/TimeSheetsList.vue'));
 
 new Vue({
-	el: 'body'
+	el: 'body',
+
+	methods: {
+		showUserPreferencesModal() {
+			when('show.user.preferences.modal')
+				.broadcast(null);
+		}
+	},
+
+	components: {
+		'modal-user-preferences': require('./components/ModalUserPreferences.vue')
+	}
 });
 
 $(() => {
@@ -26,12 +37,12 @@ $(() => {
 			cancelLabel: 'Clear',
 			format: 'MMMM Do YYYY'
 		}
-	}).on('apply.daterangepicker', function(e, picker) {
+	}).on('apply.daterangepicker', function (e, picker) {
 		$(this).val(picker.startDate.format('MMMM Do YYYY') + ' - ' + picker.endDate.format('MMMM Do YYYY'));
 
 		when('filter.timesheets.by.date.range')
 			.broadcast($(this).val());
-	}).on('cancel.daterangepicker', function(e, picker) {
+	}).on('cancel.daterangepicker', function (e, picker) {
 		$(this).val('');
 
 		when('filter.timesheets.by.date.range')
@@ -47,14 +58,14 @@ $(() => {
 	});
 
 	/*$('.loginForm').on('submit', function(e) {
-		e.preventDefault();
+	 e.preventDefault();
 
-		$.ajax({
-			method: $(this).attr('method'),
-			url: $(this).attr('action'),
-			data: $(this).serialize()
-		}).done(function(response) {
-			console.log(response);
-		});
-	})*/
+	 $.ajax({
+	 method: $(this).attr('method'),
+	 url: $(this).attr('action'),
+	 data: $(this).serialize()
+	 }).done(function(response) {
+	 console.log(response);
+	 });
+	 })*/
 });

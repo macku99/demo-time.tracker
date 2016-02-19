@@ -22485,7 +22485,17 @@ Vue.component('users-list', require('./components/UsersList.vue'));
 Vue.component('timesheets-list', require('./components/TimeSheetsList.vue'));
 
 new Vue({
-	el: 'body'
+	el: 'body',
+
+	methods: {
+		showUserPreferencesModal: function showUserPreferencesModal() {
+			when('show.user.preferences.modal').broadcast(null);
+		}
+	},
+
+	components: {
+		'modal-user-preferences': require('./components/ModalUserPreferences.vue')
+	}
 });
 
 $(function () {
@@ -22522,18 +22532,18 @@ $(function () {
 	});
 
 	/*$('.loginForm').on('submit', function(e) {
- 	e.preventDefault();
- 		$.ajax({
- 		method: $(this).attr('method'),
- 		url: $(this).attr('action'),
- 		data: $(this).serialize()
- 	}).done(function(response) {
- 		console.log(response);
- 	});
- })*/
+  e.preventDefault();
+ 	 $.ajax({
+  method: $(this).attr('method'),
+  url: $(this).attr('action'),
+  data: $(this).serialize()
+  }).done(function(response) {
+  console.log(response);
+  });
+  })*/
 });
 
-},{"./components/TimeSheetsList.vue":98,"./components/UsersList.vue":99,"./core/dependencies":100,"vue-resource":80}],93:[function(require,module,exports){
+},{"./components/ModalUserPreferences.vue":97,"./components/TimeSheetsList.vue":99,"./components/UsersList.vue":100,"./core/dependencies":101,"vue-resource":80}],93:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -22745,7 +22755,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"../components/FormErrorBlock.vue":93,"../components/Modal.vue":94,"../helpers/Form":101,"../stores/TimeSheetsStore":103,"vue":91,"vue-hot-reload-api":66}],96:[function(require,module,exports){
+},{"../components/FormErrorBlock.vue":93,"../components/Modal.vue":94,"../helpers/Form":102,"../stores/TimeSheetsStore":104,"vue":91,"vue-hot-reload-api":66}],96:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -22873,7 +22883,99 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"../components/FormErrorBlock.vue":93,"../components/Modal.vue":94,"../helpers/Form":101,"../stores/UsersStore":104,"vue":91,"vue-hot-reload-api":66}],97:[function(require,module,exports){
+},{"../components/FormErrorBlock.vue":93,"../components/Modal.vue":94,"../helpers/Form":102,"../stores/UsersStore":105,"vue":91,"vue-hot-reload-api":66}],97:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var Form = require('../helpers/Form');
+var UsersStore = require('../stores/UsersStore');
+
+exports.default = {
+	props: {
+		title: {
+			type: String,
+			default: ''
+		}
+	},
+
+	data: function data() {
+		return {
+			show: false,
+			user: null,
+			preferencesForm: this.resetFormData(),
+			dataProviders: {
+				hours: _.range(24).map(function (value) {
+					return value + 1;
+				})
+			}
+		};
+	},
+	ready: function ready() {
+		var _this = this;
+
+		when('show.user.preferences.modal').subscribe(function (user) {
+			_this.$set('user', user);
+			_this.$set('show', true);
+			if (user) {
+				_this.$set('preferencesForm', new Form({
+					preferredDailyHours: user.preferredDailyHours
+				}));
+			} else {
+				_this.$set('preferencesForm', _this.resetFormData());
+			}
+		});
+	},
+
+
+	methods: {
+		updateUserPreferences: function updateUserPreferences() {
+			var _this2 = this;
+
+			this.preferencesForm.send(UsersStore.updateUserPreferences(this.user, this.preferencesForm.data).then(function () {
+				// close modal
+				_this2.close();
+			}));
+		},
+		resetFormData: function resetFormData() {
+			return new Form({
+				preferredDailyHours: null
+			});
+		},
+		close: function close() {
+			this.show = false;
+			this.user = null;
+			this.preferencesForm = this.resetFormData();
+		}
+	},
+
+	computed: {
+		formData: function formData() {
+			return this.preferencesForm.data;
+		}
+	},
+
+	components: {
+		modal: require('../components/Modal.vue'),
+		'form-error-block': require('../components/FormErrorBlock.vue')
+	}
+};
+if (module.exports.__esModule) module.exports = module.exports.default
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<modal :show.sync=\"show\" @hidden.modal=\"close\" :title=\"title\">\n\n\t<form class=\"form-horizontal\">\n\t\t<div class=\"form-group\" :class=\"{ 'has-error': preferencesForm.hasError('preferredDailyHours') == true }\">\n\t\t\t<label for=\"preferredDailyHours\" class=\"col-md-4 control-label\">Preferred Daily Hours</label>\n\n\t\t\t<div class=\"col-md-3\">\n\t\t\t\t<select id=\"preferredDailyHours\" name=\"preferredDailyHours\" class=\"form-control\" v-model=\"formData.preferredDailyHours\">\n\t\t\t\t\t<option :value=\"null\">please select</option>\n\t\t\t\t\t<option v-for=\"hour in dataProviders.hours\" :value=\"hour\">\n\t\t\t\t\t\t{{ hour }} {{ hour | pluralize 'hour' }}\n\t\t\t\t\t</option>\n\t\t\t\t</select>\n\t\t\t\t<form-error-block :form=\"preferencesForm\" attribute=\"preferredDailyHours\"></form-error-block>\n\t\t\t</div>\n\t\t</div>\n\t</form>\n\n\t<button slot=\"action\" type=\"button\" class=\"btn btn-info\" @click.prevent=\"updateUserPreferences\" :disabled=\"preferencesForm.busy\">\n\t\t<span v-if=\"preferencesForm.busy\">\n\t\t\tSUBMITTING...\n\t\t</span>\n\t\t<span v-else=\"\">\n\t\t\tSUBMIT\n\t\t</span>\n\t</button>\n</modal>\n"
+if (module.hot) {(function () {  module.hot.accept()
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), true)
+  if (!hotAPI.compatible) return
+  var id = "/var/www/demo-time.manager/resources/assets/js/components/ModalUserPreferences.vue"
+  if (!module.hot.data) {
+    hotAPI.createRecord(id, module.exports)
+  } else {
+    hotAPI.update(id, module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
+  }
+})()}
+},{"../components/FormErrorBlock.vue":93,"../components/Modal.vue":94,"../helpers/Form":102,"../stores/UsersStore":105,"vue":91,"vue-hot-reload-api":66}],98:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -23016,7 +23118,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"babel-runtime/core-js/get-iterator":3,"vue":91,"vue-hot-reload-api":66}],98:[function(require,module,exports){
+},{"babel-runtime/core-js/get-iterator":3,"vue":91,"vue-hot-reload-api":66}],99:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -23145,7 +23247,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"../components/ModalCreateOrUpdateTimeSheet.vue":95,"../components/Pagination.vue":97,"../stores/TimeSheetsStore":103,"vue":91,"vue-hot-reload-api":66}],99:[function(require,module,exports){
+},{"../components/ModalCreateOrUpdateTimeSheet.vue":95,"../components/Pagination.vue":98,"../stores/TimeSheetsStore":104,"vue":91,"vue-hot-reload-api":66}],100:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -23241,7 +23343,7 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"row toolbar\">\n\t<div class=\"col-md-6\">\n\t\t<button type=\"button\" class=\"btn btn-info\" @click.prevent=\"showCreateUserModal()\">\n\t\t\tCreate User\n\t\t</button>\n\t</div>\n\t<div class=\"col-md-3 col-md-offset-3\">\n\t\t<!--input type=\"text\" value=\"01/01/15 - 01/08/15\" class=\"form-control\" data-provide=\"datepicker\"-->\n\t</div>\n</div>\n\n<table class=\"table table-hover\">\n\t<thead>\n\t<tr>\n\t\t<th v-for=\"column in columns\">{{ column }}</th>\n\t\t<th class=\"text-right\">&nbsp;</th>\n\t</tr>\n\t</thead>\n\t<tbody>\n\t<tr v-for=\"user in users\">\n\t\t<th scope=\"row\">{{ user.id }}</th>\n\t\t<td>{{ user.name }}</td>\n\t\t<td>{{ user.email }}</td>\n\t\t<td class=\"text-right\">\n\t\t\t<div class=\"btn-group\">\n\t\t\t\t<button type=\"button\" class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">\n\t\t\t\t\tActions <span class=\"caret\"></span>\n\t\t\t\t</button>\n\t\t\t\t<ul class=\"dropdown-menu\">\n\t\t\t\t\t<li>\n\t\t\t\t\t\t<a href=\"/users/{{ user.id }}/timesheets\">Time Sheets</a>\n\t\t\t\t\t</li>\n\t\t\t\t\t<li role=\"separator\" class=\"divider\"></li>\n\t\t\t\t\t<li>\n\t\t\t\t\t\t<a href=\"#\" @click.prevent=\"showUpdateUserModal(user)\">Update</a>\n\t\t\t\t\t</li>\n\t\t\t\t\t<li><a href=\"#\" @click.prevent=\"removeUser(user)\">Remove</a></li>\n\t\t\t\t</ul>\n\t\t\t</div>\n\t\t</td>\n\t</tr>\n\t</tbody>\n</table>\n\n<pagination :current-page.sync=\"pagination.currentPage\" :total-items=\"pagination.totalPages\" :per-page=\"pagination.perPage\" @pagination.page.changed=\"whenPaginationPageHasChanged\" v-if=\"users\">\n</pagination>\n\n<modal-create-or-update-user :type=\"modal.type\" :title=\"modal.title\"></modal-create-or-update-user>\n\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"row toolbar\">\n\t<div class=\"col-md-6\">\n\t\t<button type=\"button\" class=\"btn btn-info\" @click.prevent=\"showCreateUserModal()\">\n\t\t\tCreate User\n\t\t</button>\n\t</div>\n</div>\n\n<table class=\"table table-hover\">\n\t<thead>\n\t<tr>\n\t\t<th v-for=\"column in columns\">{{ column }}</th>\n\t\t<th class=\"text-right\">&nbsp;</th>\n\t</tr>\n\t</thead>\n\t<tbody>\n\t<tr v-for=\"user in users\">\n\t\t<th scope=\"row\">{{ user.id }}</th>\n\t\t<td>{{ user.name }}</td>\n\t\t<td>{{ user.email }}</td>\n\t\t<td class=\"text-right\">\n\t\t\t<div class=\"btn-group\">\n\t\t\t\t<button type=\"button\" class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">\n\t\t\t\t\tActions <span class=\"caret\"></span>\n\t\t\t\t</button>\n\t\t\t\t<ul class=\"dropdown-menu\">\n\t\t\t\t\t<li>\n\t\t\t\t\t\t<a href=\"/users/{{ user.id }}/timesheets\">Time Sheets</a>\n\t\t\t\t\t</li>\n\t\t\t\t\t<li role=\"separator\" class=\"divider\"></li>\n\t\t\t\t\t<li>\n\t\t\t\t\t\t<a href=\"#\" @click.prevent=\"showUpdateUserModal(user)\">Update</a>\n\t\t\t\t\t</li>\n\t\t\t\t\t<li><a href=\"#\" @click.prevent=\"removeUser(user)\">Remove</a></li>\n\t\t\t\t</ul>\n\t\t\t</div>\n\t\t</td>\n\t</tr>\n\t</tbody>\n</table>\n\n<pagination :current-page.sync=\"pagination.currentPage\" :total-items=\"pagination.totalPages\" :per-page=\"pagination.perPage\" @pagination.page.changed=\"whenPaginationPageHasChanged\" v-if=\"users\">\n</pagination>\n\n<modal-create-or-update-user :type=\"modal.type\" :title=\"modal.title\"></modal-create-or-update-user>\n\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
@@ -23253,7 +23355,7 @@ if (module.hot) {(function () {  module.hot.accept()
     hotAPI.update(id, module.exports, (typeof module.exports === "function" ? module.exports.options : module.exports).template)
   }
 })()}
-},{"../components/ModalCreateOrUpdateUser.vue":96,"../components/Pagination.vue":97,"../stores/UsersStore":104,"vue":91,"vue-hot-reload-api":66}],100:[function(require,module,exports){
+},{"../components/ModalCreateOrUpdateUser.vue":96,"../components/Pagination.vue":98,"../stores/UsersStore":105,"vue":91,"vue-hot-reload-api":66}],101:[function(require,module,exports){
 'use strict';
 
 window._ = require('underscore');
@@ -23265,7 +23367,7 @@ window.Vue = require('vue');
 window.Helpers = require('../helpers/Helpers');
 window.sweetalert = require('sweetalert');
 
-},{"../helpers/Helpers":102,"moment":41,"promise":43,"radio":51,"sweetalert":60,"underscore":61,"urijs":64,"vue":91}],101:[function(require,module,exports){
+},{"../helpers/Helpers":103,"moment":41,"promise":43,"radio":51,"sweetalert":60,"underscore":61,"urijs":64,"vue":91}],102:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
@@ -23331,7 +23433,7 @@ var Form = function Form(formData) {
 
 module.exports = Form;
 
-},{}],102:[function(require,module,exports){
+},{}],103:[function(require,module,exports){
 'use strict';
 
 var Helpers = {
@@ -23352,7 +23454,7 @@ var Helpers = {
 
 module.exports = Helpers;
 
-},{}],103:[function(require,module,exports){
+},{}],104:[function(require,module,exports){
 'use strict';
 
 var TimeSheetsStore = {
@@ -23430,7 +23532,7 @@ var TimeSheetsStore = {
 
 module.exports = TimeSheetsStore;
 
-},{}],104:[function(require,module,exports){
+},{}],105:[function(require,module,exports){
 'use strict';
 
 var UsersStore = {

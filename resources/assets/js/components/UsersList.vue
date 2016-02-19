@@ -104,9 +104,6 @@
 				Create User
 			</button>
 		</div>
-		<div class="col-md-3 col-md-offset-3">
-			<!--input type="text" value="01/01/15 - 01/08/15" class="form-control" data-provide="datepicker"-->
-		</div>
 	</div>
 
 	<table class="table table-hover">

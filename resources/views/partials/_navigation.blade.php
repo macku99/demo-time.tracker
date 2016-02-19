@@ -12,7 +12,11 @@
                     <i class="fa fa-btn fa-calendar"></i>My Timesheets
                 </a>
             </li>
-            <li><a href="{{ url('/preferences') }}"><i class="fa fa-btn fa-cog"></i>Preferences</a></li>
+            <li>
+                <a href="{{ url('/preferences') }}" @click.prevent="showUserPreferencesModal()">
+                    <i class="fa fa-btn fa-cog"></i>Preferences
+                </a>
+            </li>
         @endunless
     </ul>
 
@@ -35,3 +39,5 @@
         @endif
     </ul>
 </div>
+
+<modal-user-preferences title="Preferences"></modal-user-preferences>
