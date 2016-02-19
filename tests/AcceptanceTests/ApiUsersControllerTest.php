@@ -2,9 +2,12 @@
 
 use App\DataModels\User\User;
 use TestCase;
+use UsesJWTTokens;
 
 class ApiUsersControllerTest extends TestCase
 {
+
+    use UsesJWTTokens;
 
     /**
      * @test
@@ -13,10 +16,34 @@ class ApiUsersControllerTest extends TestCase
     {
         factory(User::class, 10)->create();
 
-        $this->json('GET', 'api/users')
+        $this->jwtJson('GET', 'api/users')
              ->seeStatusCode(200)
              ->shouldReturnJson([
-                 'total' => 10,
+                 'total' => 10 + 1,
+             ]);
+    }
+
+    /**
+     * @test
+     */
+    public function it_does_not_allow_regular_users_to_fetch_users()
+    {
+        $this->withAuthUser(factory(User::class, 'regular')->create())
+             ->jwtJson('GET', 'api/users')
+             ->seeStatusCode(403);
+    }
+
+    /**
+     * @test
+     */
+    public function it_throws_a_400_if_the_request_does_not_include_a_JWT_token()
+    {
+        factory(User::class, 10)->create();
+
+        $this->json('GET', 'api/users')
+             ->seeStatusCode(400)
+             ->shouldReturnJson([
+                 'error' => 'token_not_provided',
              ]);
     }
 
@@ -27,7 +54,7 @@ class ApiUsersControllerTest extends TestCase
     {
         $user = factory(User::class)->create();
 
-        $this->json('GET', 'api/users/' . $user->id)
+        $this->jwtJson('GET', 'api/users/' . $user->id)
              ->seeStatusCode(200)
              ->shouldReturnJson([
                  'id'    => $user->id,
@@ -38,9 +65,21 @@ class ApiUsersControllerTest extends TestCase
     /**
      * @test
      */
+    public function it_does_not_allow_regular_users_to_fetch_a_single_user()
+    {
+        $user = factory(User::class)->create();
+
+        $this->withAuthUser(factory(User::class, 'regular')->create())
+             ->jwtJson('GET', 'api/users/' . $user->id)
+             ->seeStatusCode(403);
+    }
+
+    /**
+     * @test
+     */
     public function it_throws_404_if_a_user_is_not_found()
     {
-        $this->json('GET', 'api/users/NON_EXISTENT_USER')
+        $this->jwtJson('GET', 'api/users/NON_EXISTENT_USER')
              ->seeStatusCode(404)
              ->shouldReturnJson();
     }
@@ -50,8 +89,18 @@ class ApiUsersControllerTest extends TestCase
      */
     public function it_creates_a_new_user_using_valid_parameters()
     {
-        $this->post('api/users', $this->getStub())
+        $this->jwtJson('POST', 'api/users', $this->getStub())
              ->seeStatusCode(201);
+    }
+
+    /**
+     * @test
+     */
+    public function it_does_not_allow_regular_users_to_create_a_new_user()
+    {
+        $this->withAuthUser(factory(User::class, 'regular')->create())
+             ->jwtJson('POST', 'api/users', $this->getStub())
+             ->seeStatusCode(403);
     }
 
     /**
@@ -59,7 +108,7 @@ class ApiUsersControllerTest extends TestCase
      */
     public function it_throws_a_422_if_the_creation_of_new_user_fails_validation()
     {
-        $this->json('POST', "api/users", [])
+        $this->jwtJson('POST', "api/users", [])
              ->seeStatusCode(422);
     }
 
@@ -70,8 +119,20 @@ class ApiUsersControllerTest extends TestCase
     {
         $user = factory(User::class)->create();
 
-        $this->put("api/users/{$user->id}", $this->getStub())
+        $this->jwtJson('PUT', "api/users/{$user->id}", $this->getStub())
              ->seeStatusCode(202);
+    }
+
+    /**
+     * @test
+     */
+    public function it_does_not_allow_regular_users_to_update_an_existent_user()
+    {
+        $user = factory(User::class)->create();
+
+        $this->withAuthUser(factory(User::class, 'regular')->create())
+             ->jwtJson('PUT', "api/users/{$user->id}", $this->getStub())
+             ->seeStatusCode(403);
     }
 
     /**
@@ -79,7 +140,7 @@ class ApiUsersControllerTest extends TestCase
      */
     public function it_throws_404_if_the_user_to_be_updated_is_not_found()
     {
-        $this->put("api/users/NOT_FOUND_USER", $this->getStub())
+        $this->jwtJson('PUT', "api/users/NOT_FOUND_USER", $this->getStub())
              ->seeStatusCode(404);
     }
 
@@ -90,27 +151,39 @@ class ApiUsersControllerTest extends TestCase
     {
         $user = factory(User::class)->create();
 
-        $this->json('PUT', "api/users/{$user->id}", [])
+        $this->jwtJson('PUT', "api/users/{$user->id}", [])
              ->seeStatusCode(422);
     }
 
     /**
      * @test
      */
-    public function it_destroys_an_user()
+    public function it_removes_an_existent_user()
     {
         $user = factory(User::class)->create();
 
-        $this->json('DELETE', "api/users/{$user->id}")
+        $this->jwtJson('DELETE', "api/users/{$user->id}")
              ->seeStatusCode(202);
     }
 
     /**
      * @test
      */
-    public function it_throws_404_if_the_given_user_is_not_found_when_destroying_an_user()
+    public function it_does_not_allow_regular_users_to_remove_an_existent_user()
     {
-        $this->json('DELETE', "api/users/NOT_EXISTENT_USER")
+        $user = factory(User::class)->create();
+
+        $this->withAuthUser(factory(User::class, 'regular')->create())
+             ->jwtJson('DELETE', "api/users/{$user->id}")
+             ->seeStatusCode(403);
+    }
+
+    /**
+     * @test
+     */
+    public function it_throws_404_if_the_given_user_is_not_found_when_removing_an_user()
+    {
+        $this->jwtJson('DELETE', "api/users/NOT_EXISTENT_USER")
              ->seeStatusCode(404);
     }
 
@@ -120,6 +193,7 @@ class ApiUsersControllerTest extends TestCase
     protected function getStub()
     {
         return [
+            'role'                  => $this->fake->randomElement(['regular', 'admin']),
             'name'                  => 'Joe Doe',
             'email'                 => 'joe@email.com',
             'password'              => 'Qw3rt!',

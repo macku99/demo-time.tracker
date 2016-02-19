@@ -8,6 +8,7 @@ use App\Http\Requests\Request;
  * @author  macku99
  * @version 1.0
  *
+ * @property string $role
  * @property string $name
  * @property string $email
  * @property string $password
@@ -22,6 +23,7 @@ class CreateUserRequest extends Request
     public function rules()
     {
         return [
+            'role'     => 'bail|required|in:regular,admin',
             'name'     => 'bail|required|max:255',
             'email'    => 'bail|required|email|max:255|unique:users',
             'password' => 'bail|required|confirmed|min:6',

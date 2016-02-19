@@ -15,7 +15,7 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
      *
      * @var string
      */
-    protected $baseUrl = 'http://local.time.manager';
+    protected $baseUrl = null;
 
     /**
      * @var Faker
@@ -28,6 +28,7 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
     {
         parent::__construct();
 
+        $this->baseUrl = env('APP_URL');
         $this->fake = Faker::create();
     }
 

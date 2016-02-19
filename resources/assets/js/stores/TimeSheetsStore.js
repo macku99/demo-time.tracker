@@ -5,8 +5,16 @@ var TimeSheetsStore = {
 	TIMESHEET_UPDATED: 'TIMESHEET_UPDATED',
 	TIMESHEET_REMOVED: 'TIMESHEET_REMOVED',
 
-	allOfUser(userId, page) {
-		Vue.http.get('/api/users/' + userId + '/timesheets' + (page ? '?page=' + page : ''))
+	allOfUser(userId, page, dateRange) {
+		var url = new URI('/api/users/' + userId + '/timesheets')
+			.query({
+				page: page ? page : undefined,
+				dateRange: dateRange ? dateRange : undefined
+			})
+			.normalize()
+			.toString();
+
+		Vue.http.get(url)
 			.then(
 				response => {
 					when(this.TIMESHEETS_LIST_RETRIEVED)

@@ -12,6 +12,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @version 1.0
  *
  * @property string     $id
+ * @property string     $role
  * @property string     $name
  * @property string     $email
  * @property string     $password
@@ -29,7 +30,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'preferred_daily_hours',
+        'role', 'name', 'email', 'password', 'preferred_daily_hours',
     ];
 
     /**
@@ -47,6 +48,14 @@ class User extends Authenticatable
     public function timesheets()
     {
         return $this->hasMany(TimeSheet::class);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
     }
 
 }

@@ -29,7 +29,7 @@ class UserIsAllowedToWorkOnly24HoursPerDaySpecification
                                    }
                                })
                                ->groupBy('date')
-                               ->havingRaw("SUM(hours) + $hours > 24")
+                               ->havingRaw("SUM(hours) + {$hours} > 24")
                                ->count();
 
         return $overWorked ? false : true;

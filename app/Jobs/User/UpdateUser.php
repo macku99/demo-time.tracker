@@ -22,6 +22,11 @@ class UpdateUser extends Job
     /**
      * @var string
      */
+    protected $role;
+
+    /**
+     * @var string
+     */
     protected $name;
 
     /**
@@ -41,14 +46,16 @@ class UpdateUser extends Job
 
     /**
      * @param int    $id
+     * @param string $role
      * @param string $name
      * @param string $email
      * @param string $password
      * @param int    $preferredDailyHours
      */
-    public function __construct($id, $name, $email, $password = null, $preferredDailyHours = null)
+    public function __construct($id, $role, $name, $email, $password = null, $preferredDailyHours = null)
     {
         $this->id = $id;
+        $this->role = $role;
         $this->name = $name;
         $this->email = $email;
         $this->password = $password;
@@ -64,6 +71,7 @@ class UpdateUser extends Job
 
         $user = User::findOrFail($this->id);
 
+        $user->role = $this->role;
         $user->name = $this->name;
         $user->email = $this->email;
         if ( ! is_null($this->password)) {

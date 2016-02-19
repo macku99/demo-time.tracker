@@ -20,6 +20,8 @@ class ApiUsersController extends ApiController
      */
     public function index()
     {
+        $this->authorize('index', User::class);
+
         $users = User::paginate(20);
 
         return $this->respondWithCollection($users, new UserTransformer);
@@ -33,6 +35,8 @@ class ApiUsersController extends ApiController
      */
     public function show(User $users)
     {
+        $this->authorize('show', User::class);
+
         return $this->respondWithItem($users, new UserTransformer);
     }
 
@@ -44,8 +48,13 @@ class ApiUsersController extends ApiController
      */
     public function store(CreateUserRequest $request)
     {
+        $this->authorize('store', User::class);
+
         $this->dispatch(
-            new CreateUser($request->name, $request->email, $request->password, $request->preferredDailyHours)
+            new CreateUser(
+                $request->role, $request->name, $request->email, $request->password,
+                $request->preferredDailyHours
+            )
         );
 
         return $this->respondCreated();
@@ -55,13 +64,18 @@ class ApiUsersController extends ApiController
      * Update User.
      *
      * @param  UpdateUserRequest $request
-     * @param  int               $userId
+     * @param  User              $users
      * @return Response
      */
-    public function update(UpdateUserRequest $request, $userId)
+    public function update(UpdateUserRequest $request, User $users)
     {
+        $this->authorize('update', $users);
+
         $this->dispatch(
-            new UpdateUser($userId, $request->name, $request->email, $request->password, $request->preferredDailyHours)
+            new UpdateUser(
+                $users->id, $request->role, $request->name, $request->email, $request->password,
+                $request->preferredDailyHours
+            )
         );
 
         return $this->respondAccepted();
@@ -70,13 +84,15 @@ class ApiUsersController extends ApiController
     /**
      * Destroy User.
      *
-     * @param  int $userId
+     * @param  User $users
      * @return Response
      */
-    public function destroy($userId)
+    public function destroy(User $users)
     {
+        $this->authorize('destroy', $users);
+
         $this->dispatch(
-            new DestroyUser($userId)
+            new DestroyUser($users->id)
         );
 
         return $this->respondAccepted();

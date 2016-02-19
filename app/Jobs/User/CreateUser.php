@@ -17,6 +17,11 @@ class CreateUser extends Job
     /**
      * @var string
      */
+    protected $role;
+
+    /**
+     * @var string
+     */
     protected $name;
 
     /**
@@ -35,13 +40,15 @@ class CreateUser extends Job
     private $preferredDailyHours;
 
     /**
+     * @param string $role
      * @param string $name
      * @param string $email
      * @param string $password
      * @param int    $preferredDailyHours
      */
-    public function __construct($name, $email, $password, $preferredDailyHours = null)
+    public function __construct($role, $name, $email, $password, $preferredDailyHours = null)
     {
+        $this->role = $role;
         $this->name = $name;
         $this->email = $email;
         $this->password = $password;
@@ -57,6 +64,7 @@ class CreateUser extends Job
 
         $user = new User();
 
+        $user->role = $this->role;
         $user->name = $this->name;
         $user->email = $this->email;
         $user->password = bcrypt($this->password);

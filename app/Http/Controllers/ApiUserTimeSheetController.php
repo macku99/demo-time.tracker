@@ -20,6 +20,8 @@ class ApiUserTimeSheetController extends ApiController
      */
     public function index(User $users)
     {
+        $this->authorize('index', [TimeSheet::class, $users->id]);
+
         $timeSheets = $users->timesheets()->orderBy('date', 'DESC')->paginate(20);
 
         return $this->respondWithCollection($timeSheets, new TimeSheetTransformer);
@@ -34,6 +36,8 @@ class ApiUserTimeSheetController extends ApiController
      */
     public function show(User $users, TimeSheet $timesheets)
     {
+        $this->authorize('show', [TimeSheet::class, $users->id]);
+
         return $this->respondWithItem($timesheets, new TimeSheetTransformer);
     }
 
@@ -46,6 +50,8 @@ class ApiUserTimeSheetController extends ApiController
      */
     public function store(Request $request, User $users)
     {
+        $this->authorize('store', [TimeSheet::class, $users->id]);
+
         $this->validate($request, $this->validationRules());
 
         $this->dispatch(
@@ -65,6 +71,8 @@ class ApiUserTimeSheetController extends ApiController
      */
     public function update(Request $request, User $users, TimeSheet $timesheets)
     {
+        $this->authorize('update', $timesheets);
+
         $this->validate($request, $this->validationRules());
 
         $this->dispatch(
@@ -86,6 +94,8 @@ class ApiUserTimeSheetController extends ApiController
      */
     public function destroy(User $users, TimeSheet $timesheets)
     {
+        $this->authorize('destroy', $timesheets);
+
         $this->dispatch(
             new DestroyTimeSheet($timesheets->id)
         );
@@ -101,7 +111,7 @@ class ApiUserTimeSheetController extends ApiController
     protected function validationRules()
     {
         return [
-            'date'        => 'bail|required|date',
+            'date'        => 'bail|required',
             'hours'       => 'bail|required|numeric|min:0.5|max:24',
             'description' => 'required',
         ];

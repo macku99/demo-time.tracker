@@ -35,6 +35,7 @@ class UserTransformer extends TransformerAbstract
 
         return [
             'id'                  => (int) $user->id,
+            'role'                => $user->role,
             'name'                => trim($user->name),
             'email'               => $user->email,
             'preferredDailyHours' => (int) $user->preferred_daily_hours,

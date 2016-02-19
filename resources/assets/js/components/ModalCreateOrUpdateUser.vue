@@ -35,6 +35,7 @@
 					this.$set('show', true);
 					if (user) {
 						this.$set('userForm', new Form({
+							role: user.role,
 							name: user.name,
 							email: user.email,
 							password: null,
@@ -76,6 +77,7 @@
 
 			resetFormData() {
 				return new Form({
+					role: 'regular',
 					name: null,
 					email: null,
 					password: null,
@@ -109,6 +111,19 @@
 	<modal :show.sync="show" @hidden.modal="close" :title="title">
 
 		<form class="form-horizontal">
+			<div class="form-group" :class="{ 'has-error': userForm.hasError('role') == true }">
+				<label for="role" class="col-md-4 control-label">Role</label>
+
+				<div class="col-md-6">
+					<label class="radio-inline">
+						<input type="radio" name="role" value="regular" v-model="formData.role"> Regular User
+					</label>
+					<label class="radio-inline">
+						<input type="radio" name="role" value="admin" v-model="formData.role"> Admin User
+					</label>
+					<form-error-block :form="userForm" attribute="role"></form-error-block>
+				</div>
+			</div>
 			<div class="form-group" :class="{ 'has-error': userForm.hasError('name') == true }">
 				<label for="name" class="col-md-4 control-label">Name</label>
 

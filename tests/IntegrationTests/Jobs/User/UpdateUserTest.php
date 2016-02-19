@@ -18,11 +18,12 @@ class UpdateUserTest extends TestCase
         $user = $this->make(User::class);
 
         $this->dispatch(
-            new UpdateUser($user->id, 'Joe Doe', 'joe@example.com')
+            new UpdateUser($user->id, 'admin', 'Joe Doe', 'joe@example.com')
         );
 
         $this->seeInDatabase('users', [
             'id'    => $user->id,
+            'role'  => 'admin',
             'name'  => 'Joe Doe',
             'email' => 'joe@example.com',
         ]);
@@ -41,7 +42,7 @@ class UpdateUserTest extends TestCase
         $user = $this->make(User::class);
 
         $this->dispatch(
-            new UpdateUser($user->id, 'Joe Doe', 'joe@example.com')
+            new UpdateUser($user->id, 'admin', 'Joe Doe', 'joe@example.com')
         );
     }
 
@@ -51,6 +52,7 @@ class UpdateUserTest extends TestCase
     protected function getStub()
     {
         return [
+            'role'     => 'admin',
             'name'     => $this->fake->name,
             'email'    => $this->fake->email,
             'password' => $this->fake->password,

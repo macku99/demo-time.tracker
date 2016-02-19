@@ -55,6 +55,15 @@
 			when(TimeSheetsStore.TIMESHEET_REMOVED).subscribe(() => {
 				Helpers.success('The timesheet has been successfully removed.');
 			});
+
+			when('filter.timesheets.by.date.range').subscribe((dateRange) => {
+				this.$set('filters', {
+					dateRange: dateRange
+				});
+
+				// fetch the user's timesheets
+				TimeSheetsStore.allOfUser(this.userId, null, this.filters.dateRange);
+			});
 		},
 
 		methods: {
@@ -90,8 +99,9 @@
 			},
 
 			whenPaginationPageHasChanged(page) {
+				console.log(this.filters.dateRange);
 				// fetch the user's timesheets for the page
-				TimeSheetsStore.allOfUser(this.userId, page);
+				TimeSheetsStore.allOfUser(this.userId, page, this.filters.dateRange);
 			}
 		},
 

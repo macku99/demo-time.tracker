@@ -5,6 +5,7 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateUsersTable extends Migration
 {
+
     /**
      * Run the migrations.
      *
@@ -14,6 +15,7 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
+            $table->enum('role', ['regular', 'admin'])->default('regular');
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password', 60);
@@ -32,4 +34,5 @@ class CreateUsersTable extends Migration
     {
         Schema::drop('users');
     }
+
 }

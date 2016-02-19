@@ -18,10 +18,11 @@ class CreateUserTest extends TestCase
         $data = $this->getStub();
 
         $this->dispatch(
-            new CreateUser($data['name'], $data['email'], $data['password'])
+            new CreateUser($data['role'], $data['name'], $data['email'], $data['password'])
         );
 
         $this->seeInDatabase('users', [
+            'role'  => $data['role'],
             'name'  => $data['name'],
             'email' => $data['email'],
         ]);
@@ -40,7 +41,7 @@ class CreateUserTest extends TestCase
         $data = $this->getStub();
 
         $this->dispatch(
-            new CreateUser($data['name'], 'joe@example.com', $data['password'])
+            new CreateUser($data['role'], $data['name'], 'joe@example.com', $data['password'])
         );
     }
 
@@ -50,6 +51,7 @@ class CreateUserTest extends TestCase
     protected function getStub()
     {
         return [
+            'role'     => 'admin',
             'name'     => $this->fake->name,
             'email'    => $this->fake->email,
             'password' => $this->fake->password,

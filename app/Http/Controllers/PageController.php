@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers;
 
+use App\DataModels\TimeSheet\TimeSheet;
 use App\DataModels\User\User;
 use App\Http\Requests;
 use Illuminate\Http\Response;
@@ -32,6 +33,8 @@ class PageController extends Controller
      */
     public function users()
     {
+        $this->authorize('index', User::class);
+
         return view('users');
     }
 
@@ -46,17 +49,9 @@ class PageController extends Controller
         $userId = $users->id;
         $userName = $users->name;
 
-        return view('timesheets', compact('userId', 'userName'));
-    }
+        $this->authorize('index', [TimeSheet::class, $userId]);
 
-    /**
-     * Show the application account settings page.
-     *
-     * @return Response
-     */
-    public function account()
-    {
-        return view('account');
+        return view('timesheets', compact('userId', 'userName'));
     }
 
 }
