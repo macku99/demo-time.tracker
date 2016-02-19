@@ -2,6 +2,7 @@
 
 use App\DataModels\TimeSheet\TimeSheet;
 use Carbon\Carbon;
+use DB;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -14,15 +15,56 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        /*TimeSheet::created(function (TimeSheet $timeSheet) {
-            \DB::statement('insert into timesheets_summary (user_id, date, hours) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE hours = hours + ?',
-                [
-                    $timeSheet->user_id,
-                    (new Carbon($timeSheet->date))->toDateString(),
-                    $timeSheet->hours,
-                    $timeSheet->hours,
-                ]);
-        });*/
+        DB::listen(function ($query) {
+            //var_dump($query->sql);
+            // $query->bindings
+            // $query->time
+        });
+
+        TimeSheet::created(function (TimeSheet $timeSheet) {
+            $userId = $timeSheet->user_id;
+            $timeSheetDate = (new Carbon($timeSheet->date))->toDateString();
+            $hours = $timeSheet->hours;
+
+            $exists = DB::table('timesheets_summary')
+                        ->where('user_id', $userId)
+                        ->where('date', $timeSheetDate)
+                        ->exists();
+
+            if ($exists) {
+                DB::table('timesheets_summary')
+                  ->where('user_id', $userId)
+                  ->where('date', $timeSheetDate)
+                  ->update(['hours' => DB::raw("hours + {$hours}")]);
+            } else {
+                DB::table('timesheets_summary')
+                  ->insert([
+                      'user_id' => $userId,
+                      'date'    => $timeSheetDate,
+                      'hours'   => $hours,
+                  ]);
+            }
+        });
+        TimeSheet::updated(function (TimeSheet $timeSheet) {
+            $userId = $timeSheet->user_id;
+            $timeSheetDate = (new Carbon($timeSheet->date))->toDateString();
+            $hours = $timeSheet->hours - $timeSheet->getOriginal('hours');
+
+            DB::table('timesheets_summary')
+              ->where('user_id', $userId)
+              ->where('date', $timeSheetDate)
+              ->update(['hours' => DB::raw("hours + {$hours}")]);
+        });
+        TimeSheet::deleted(function (TimeSheet $timeSheet) {
+            $userId = $timeSheet->user_id;
+            $timeSheetDate = (new Carbon($timeSheet->date))->toDateString();
+            $hours = $timeSheet->hours;
+
+            DB::table('timesheets_summary')
+              ->where('user_id', $userId)
+              ->where('date', $timeSheetDate)
+              ->update(['hours' => DB::raw("hours - {$hours}")]);
+        });
     }
 
     /**

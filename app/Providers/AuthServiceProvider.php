@@ -4,7 +4,6 @@ use App\DataModels\TimeSheet\TimeSheet;
 use App\DataModels\User\User;
 use App\Policies\TimeSheetPolicy;
 use App\Policies\UserPolicy;
-use App\Policies\UserPreferencesPolicy;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
