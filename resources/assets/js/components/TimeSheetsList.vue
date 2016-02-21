@@ -104,7 +104,15 @@
 			},
 
 			userOverDidIt(preferredDailyHours, totalHoursWorked) {
-				return preferredDailyHours < totalHoursWorked
+				return totalHoursWorked >= preferredDailyHours;
+			},
+
+			rowClass(preferredDailyHours, totalHoursWorked) {
+				if (this.userOverDidIt(preferredDailyHours, totalHoursWorked)) {
+					return 'success';
+				}
+
+				return 'danger';
 			}
 		},
 
@@ -147,8 +155,7 @@
 		</thead>
 		<tbody>
 		<tr
-			class="success"
-			:class="{ danger: userOverDidIt(timesheet.user.data.preferredDailyHours, timesheet.totalHoursWorkedOnTheDate) }"
+			:class="rowClass(timesheet.user.data.preferredDailyHours, timesheet.totalHoursWorkedOnTheDate)"
 			v-for="timesheet in timesheets"
 		>
 			<th class="col-md-2" scope="row">{{ timesheet.date }}</th>
