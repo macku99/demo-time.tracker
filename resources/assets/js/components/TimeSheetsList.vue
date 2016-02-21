@@ -99,9 +99,12 @@
 			},
 
 			whenPaginationPageHasChanged(page) {
-				console.log(this.filters.dateRange);
 				// fetch the user's timesheets for the page
 				TimeSheetsStore.allOfUser(this.userId, page, this.filters.dateRange);
+			},
+
+			userOverDidIt(preferredDailyHours, totalHoursWorked) {
+				return preferredDailyHours < totalHoursWorked
 			}
 		},
 
@@ -143,7 +146,11 @@
 		</tr>
 		</thead>
 		<tbody>
-		<tr v-for="timesheet in timesheets">
+		<tr
+			class="success"
+			:class="{ danger: userOverDidIt(timesheet.user.data.preferredDailyHours, timesheet.totalHoursWorkedOnTheDate) }"
+			v-for="timesheet in timesheets"
+		>
 			<th class="col-md-2" scope="row">{{ timesheet.date }}</th>
 			<td class="col-md-2">{{ timesheet.hours }} {{ timesheet.hours | pluralize 'hour' }}</td>
 			<td class="col-md-6">{{ timesheet.description }}</td>

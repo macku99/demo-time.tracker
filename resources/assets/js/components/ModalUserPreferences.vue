@@ -54,7 +54,10 @@
 							this.close();
 
 							// cache the preferredDailyHours
-							this.preferredDailyHours = this.preferencesForm.data.preferredDailyHours
+							this.preferredDailyHours = this.preferencesForm.data.preferredDailyHours;
+
+							when('update.logged.in.user.preferred.daily.hours')
+								.broadcast(this.preferredDailyHours);
 						}));
 			},
 

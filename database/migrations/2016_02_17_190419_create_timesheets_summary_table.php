@@ -21,6 +21,7 @@ class CreateTimesheetsSummaryTable extends Migration
 
             $table->date('date')->index();
             $table->decimal('hours');
+            $table->timestamps();
 
             $table->unique(['user_id', 'date']);
         });

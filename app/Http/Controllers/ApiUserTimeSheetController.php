@@ -22,7 +22,7 @@ class ApiUserTimeSheetController extends ApiController
     {
         $this->authorize('index', [TimeSheet::class, $users->id]);
 
-        $timeSheets = $users->timesheets()->orderBy('date', 'DESC')->paginate(20);
+        $timeSheets = $users->timesheets()->with('user')->orderBy('date', 'DESC')->paginate(20);
 
         return $this->respondWithCollection($timeSheets, new TimeSheetTransformer);
     }

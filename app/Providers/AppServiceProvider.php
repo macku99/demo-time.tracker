@@ -1,8 +1,10 @@
 <?php namespace App\Providers;
 
 use App\DataModels\TimeSheet\TimeSheet;
-use Carbon\Carbon;
-use DB;
+use App\DataModels\TimeSheetsSummary\TimeSheetsSummary;
+use App\DataModels\TimeSheetsSummary\TimeSheetsSummaryRepository;
+use App\Repositories\TimeSheetsSummaryCachingRepository;
+use App\Repositories\TimeSheetsSummaryEloquentORMRepository;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -15,55 +17,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        DB::listen(function ($query) {
-            //var_dump($query->sql);
-            // $query->bindings
-            // $query->time
-        });
-
         TimeSheet::created(function (TimeSheet $timeSheet) {
-            $userId = $timeSheet->user_id;
-            $timeSheetDate = (new Carbon($timeSheet->date))->toDateString();
-            $hours = $timeSheet->hours;
-
-            $exists = DB::table('timesheets_summary')
-                        ->where('user_id', $userId)
-                        ->where('date', $timeSheetDate)
-                        ->exists();
-
-            if ($exists) {
-                DB::table('timesheets_summary')
-                  ->where('user_id', $userId)
-                  ->where('date', $timeSheetDate)
-                  ->update(['hours' => DB::raw("hours + {$hours}")]);
-            } else {
-                DB::table('timesheets_summary')
-                  ->insert([
-                      'user_id' => $userId,
-                      'date'    => $timeSheetDate,
-                      'hours'   => $hours,
-                  ]);
-            }
+            (new TimeSheetsSummary)->whenTimeSheetIsCreated($timeSheet);
         });
         TimeSheet::updated(function (TimeSheet $timeSheet) {
-            $userId = $timeSheet->user_id;
-            $timeSheetDate = (new Carbon($timeSheet->date))->toDateString();
-            $hours = $timeSheet->hours - $timeSheet->getOriginal('hours');
-
-            DB::table('timesheets_summary')
-              ->where('user_id', $userId)
-              ->where('date', $timeSheetDate)
-              ->update(['hours' => DB::raw("hours + {$hours}")]);
+            (new TimeSheetsSummary)->whenTimeSheetIsUpdated($timeSheet);
         });
         TimeSheet::deleted(function (TimeSheet $timeSheet) {
-            $userId = $timeSheet->user_id;
-            $timeSheetDate = (new Carbon($timeSheet->date))->toDateString();
-            $hours = $timeSheet->hours;
-
-            DB::table('timesheets_summary')
-              ->where('user_id', $userId)
-              ->where('date', $timeSheetDate)
-              ->update(['hours' => DB::raw("hours - {$hours}")]);
+            (new TimeSheetsSummary)->whenTimeSheetIsDeleted($timeSheet);
         });
     }
 
@@ -74,7 +35,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->singleton(TimeSheetsSummaryRepository::class, function () {
+            return new TimeSheetsSummaryCachingRepository(
+                $this->app->make(TimeSheetsSummaryEloquentORMRepository::class),
+                $this->app->make('cache.store'));
+        });
     }
 
 }
