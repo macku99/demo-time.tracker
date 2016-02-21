@@ -133,6 +133,13 @@
 			>
 				Create Timesheet
 			</button>
+			<a
+				:href="'/users/' + userId + '/timesheets/export/' + (filters.dateRange ? filters.dateRange : '')"
+				target="_blank"
+				class="btn btn-warning"
+			>
+				Export TimeSheets
+			</a>
 		</div>
 		<div class="col-md-4 col-md-offset-2">
 			<input

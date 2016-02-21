@@ -20,6 +20,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('home', 'PageController@home')->name('home');
     Route::get('users', 'PageController@users')->name('users');
     Route::get('users/{users}/timesheets', 'PageController@timesheets')->name('my-timesheets');
+    Route::get('users/{users}/timesheets/export/{dateRange?}', 'PageController@exportTimesheets')->name('export-timesheets');
 
     Route::get('token', function () {
         //$token = JWTAuth::parseToken();

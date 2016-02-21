@@ -54,4 +54,20 @@ class PageController extends Controller
         return view('timesheets', compact('userId', 'userName'));
     }
 
+    /**
+     * Show the application timesheets page.
+     *
+     * @param  User   $users
+     * @param  string $dateRange
+     * @return Response
+     */
+    public function exportTimesheets(User $users, $dateRange = null)
+    {
+        $timeSheets = $users->timesheets()
+                            ->orderBy('date', 'DESC')
+                            ->get();
+
+        return view('exported-timesheets', compact('timeSheets'));
+    }
+
 }
