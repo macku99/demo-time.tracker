@@ -63,11 +63,14 @@ class PageController extends Controller
      */
     public function exportTimesheets(User $users, $dateRange = null)
     {
-        $timeSheets = $users->timesheets()
-                            ->orderBy('date', 'DESC')
-                            ->get();
+        list($rangeStartDate, $rangeEndDate) = parse_date_range($dateRange);
 
-        return view('exported-timesheets', compact('timeSheets'));
+        $timeSheets = $users->timesheets()
+            ->whereDatesInRange($rangeStartDate, $rangeEndDate)
+            ->orderBy('date', 'DESC')
+            ->get();
+
+        return view('exported-timesheets', compact('timeSheets', 'dateRange'));
     }
 
 }

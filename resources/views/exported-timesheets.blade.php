@@ -4,7 +4,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-10 col-md-offset-1">
-                @include('partials._page-header', ['pageTitle' => 'Time Sheets', 'pageSubTitle' => 'date range'])
+                @include('partials._page-header', ['pageTitle' => 'Time Sheets', 'pageSubTitle' => $dateRange])
 
                 @foreach ($timeSheets->groupBy('date') as $date => $timeSheetsPerDate)
                     <?php

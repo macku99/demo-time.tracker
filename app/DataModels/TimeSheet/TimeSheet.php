@@ -71,4 +71,24 @@ class TimeSheet extends Model
         $this->attributes['date'] = (new Carbon($value))->toDateString();
     }
 
+    /**
+     * Scope a query to only include rows for given user id and date.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $query
+     * @param  string                                $rangeStartDate
+     * @param  string                                $rangeEndDate
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeWhereDatesInRange($query, $rangeStartDate = null, $rangeEndDate = null)
+    {
+        return $query->where(function ($query) use ($rangeStartDate, $rangeEndDate) {
+            if (!is_null($rangeStartDate)) {
+                $query->where('date', '>=', $rangeStartDate);
+            }
+            if (!is_null($rangeEndDate)) {
+                $query->where('date', '<=', $rangeEndDate);
+            }
+        });
+    }
+
 }

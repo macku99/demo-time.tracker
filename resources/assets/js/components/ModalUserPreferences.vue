@@ -57,7 +57,7 @@
 							this.preferredDailyHours = this.preferencesForm.data.preferredDailyHours;
 
 							when('update.logged.in.user.preferred.daily.hours')
-								.broadcast(this.preferredDailyHours);
+								.broadcast(this.userId, this.preferredDailyHours);
 						}));
 			},
 

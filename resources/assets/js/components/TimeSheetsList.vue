@@ -56,6 +56,16 @@
 				Helpers.success('The timesheet has been successfully removed.');
 			});
 
+			// subscribe to the find out if the logged in user has updated his preferences
+			when('update.logged.in.user.preferred.daily.hours').subscribe((userId, preferredDailyHours) => {
+				// if we are looking to the logged in user timesheets list
+				if (this.userId == userId) {
+					// fetch the user's timesheets
+					TimeSheetsStore.allOfUser(this.userId);
+				}
+			});
+
+			// subscribe to find out if the timesheets list is filtered by date range
 			when('filter.timesheets.by.date.range').subscribe((dateRange) => {
 				this.$set('filters', {
 					dateRange: dateRange
@@ -137,6 +147,7 @@
 				:href="'/users/' + userId + '/timesheets/export/' + (filters.dateRange ? filters.dateRange : '')"
 				target="_blank"
 				class="btn btn-warning"
+			    v-if="timesheets.length"
 			>
 				Export TimeSheets
 			</a>

@@ -22,7 +22,13 @@ class ApiUserTimeSheetController extends ApiController
     {
         $this->authorize('index', [TimeSheet::class, $users->id]);
 
-        $timeSheets = $users->timesheets()->with('user')->orderBy('date', 'DESC')->paginate(20);
+        list($rangeStartDate, $rangeEndDate) = parse_date_range(request()->get('dateRange'));
+
+        $timeSheets = $users->timesheets()
+                            ->whereDatesInRange($rangeStartDate, $rangeEndDate)
+                            ->with('user')
+                            ->orderBy('date', 'DESC')
+                            ->paginate(20);
 
         return $this->respondWithCollection($timeSheets, new TimeSheetTransformer);
     }

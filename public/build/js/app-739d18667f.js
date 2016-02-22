@@ -22948,7 +22948,7 @@ exports.default = {
 				// cache the preferredDailyHours
 				_this2.preferredDailyHours = _this2.preferencesForm.data.preferredDailyHours;
 
-				when('update.logged.in.user.preferred.daily.hours').broadcast(_this2.preferredDailyHours);
+				when('update.logged.in.user.preferred.daily.hours').broadcast(_this2.userId, _this2.preferredDailyHours);
 			}));
 		},
 		resetFormData: function resetFormData() {
@@ -23192,6 +23192,16 @@ exports.default = {
 			Helpers.success('The timesheet has been successfully removed.');
 		});
 
+		// subscribe to the find out if the logged in user has updated his preferences
+		when('update.logged.in.user.preferred.daily.hours').subscribe(function (userId, preferredDailyHours) {
+			// if we are looking to the logged in user timesheets list
+			if (_this.userId == userId) {
+				// fetch the user's timesheets
+				TimeSheetsStore.allOfUser(_this.userId);
+			}
+		});
+
+		// subscribe to find out if the timesheets list is filtered by date range
 		when('filter.timesheets.by.date.range').subscribe(function (dateRange) {
 			_this.$set('filters', {
 				dateRange: dateRange
@@ -23255,7 +23265,7 @@ exports.default = {
 	}
 };
 if (module.exports.__esModule) module.exports = module.exports.default
-;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"row toolbar\">\n\t<div class=\"col-md-6\">\n\t\t<button type=\"button\" class=\"btn btn-info\" @click.prevent=\"showCreateTimeSheetModal()\">\n\t\t\tCreate Timesheet\n\t\t</button>\n\t\t<a :href=\"'/users/' + userId + '/timesheets/export/' + (filters.dateRange ? filters.dateRange : '')\" target=\"_blank\" class=\"btn btn-warning\">\n\t\t\tExport TimeSheets\n\t\t</a>\n\t</div>\n\t<div class=\"col-md-4 col-md-offset-2\">\n\t\t<input type=\"text\" class=\"form-control\" name=\"daterange\" placeholder=\"filter by date range\" v-model=\"filters.dateRange\" :value=\"filters.dateRange\">\n\t</div>\n</div>\n\n<table class=\"table table-hover\">\n\t<thead>\n\t<tr>\n\t\t<th v-for=\"column in columns\">{{ column }}</th>\n\t\t<th class=\"text-right\">&nbsp;</th>\n\t</tr>\n\t</thead>\n\t<tbody>\n\t<tr :class=\"rowClass(timesheet.user.data.preferredDailyHours, timesheet.totalHoursWorkedOnTheDate)\" v-for=\"timesheet in timesheets\">\n\t\t<th class=\"col-md-2\" scope=\"row\">{{ timesheet.date }}</th>\n\t\t<td class=\"col-md-2\">{{ timesheet.hours }} {{ timesheet.hours | pluralize 'hour' }}</td>\n\t\t<td class=\"col-md-6\">{{ timesheet.description }}</td>\n\t\t<td class=\"col-md-2 text-right\">\n\t\t\t<div class=\"btn-group\">\n\t\t\t\t<button type=\"button\" class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">\n\t\t\t\t\tActions <span class=\"caret\"></span>\n\t\t\t\t</button>\n\t\t\t\t<ul class=\"dropdown-menu\">\n\t\t\t\t\t<li>\n\t\t\t\t\t\t<a href=\"#\" @click.prevent=\"showUpdateTimeSheetModal(timesheet)\">Update</a>\n\t\t\t\t\t</li>\n\t\t\t\t\t<li><a href=\"#\" @click.prevent=\"removeTimeSheet(timesheet)\">Remove</a></li>\n\t\t\t\t</ul>\n\t\t\t</div>\n\t\t</td>\n\t</tr>\n\t<tr v-if=\"!timesheets.length\">\n\t\t<td colspan=\"4\" class=\"text-center\">There are no timesheets recorded.</td>\n\t</tr>\n\t</tbody>\n</table>\n\n<pagination :current-page.sync=\"pagination.currentPage\" :total-items=\"pagination.totalPages\" :per-page=\"pagination.perPage\" @pagination.page.changed=\"whenPaginationPageHasChanged\" v-if=\"timesheets\">\n</pagination>\n\n<modal-create-or-update-timesheet :user-id=\"userId\" :type=\"modal.type\" :title=\"modal.title\"></modal-create-or-update-timesheet>\n\n"
+;(typeof module.exports === "function"? module.exports.options: module.exports).template = "\n<div class=\"row toolbar\">\n\t<div class=\"col-md-6\">\n\t\t<button type=\"button\" class=\"btn btn-info\" @click.prevent=\"showCreateTimeSheetModal()\">\n\t\t\tCreate Timesheet\n\t\t</button>\n\t\t<a :href=\"'/users/' + userId + '/timesheets/export/' + (filters.dateRange ? filters.dateRange : '')\" target=\"_blank\" class=\"btn btn-warning\" v-if=\"timesheets.length\">\n\t\t\tExport TimeSheets\n\t\t</a>\n\t</div>\n\t<div class=\"col-md-4 col-md-offset-2\">\n\t\t<input type=\"text\" class=\"form-control\" name=\"daterange\" placeholder=\"filter by date range\" v-model=\"filters.dateRange\" :value=\"filters.dateRange\">\n\t</div>\n</div>\n\n<table class=\"table table-hover\">\n\t<thead>\n\t<tr>\n\t\t<th v-for=\"column in columns\">{{ column }}</th>\n\t\t<th class=\"text-right\">&nbsp;</th>\n\t</tr>\n\t</thead>\n\t<tbody>\n\t<tr :class=\"rowClass(timesheet.user.data.preferredDailyHours, timesheet.totalHoursWorkedOnTheDate)\" v-for=\"timesheet in timesheets\">\n\t\t<th class=\"col-md-2\" scope=\"row\">{{ timesheet.date }}</th>\n\t\t<td class=\"col-md-2\">{{ timesheet.hours }} {{ timesheet.hours | pluralize 'hour' }}</td>\n\t\t<td class=\"col-md-6\">{{ timesheet.description }}</td>\n\t\t<td class=\"col-md-2 text-right\">\n\t\t\t<div class=\"btn-group\">\n\t\t\t\t<button type=\"button\" class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">\n\t\t\t\t\tActions <span class=\"caret\"></span>\n\t\t\t\t</button>\n\t\t\t\t<ul class=\"dropdown-menu\">\n\t\t\t\t\t<li>\n\t\t\t\t\t\t<a href=\"#\" @click.prevent=\"showUpdateTimeSheetModal(timesheet)\">Update</a>\n\t\t\t\t\t</li>\n\t\t\t\t\t<li><a href=\"#\" @click.prevent=\"removeTimeSheet(timesheet)\">Remove</a></li>\n\t\t\t\t</ul>\n\t\t\t</div>\n\t\t</td>\n\t</tr>\n\t<tr v-if=\"!timesheets.length\">\n\t\t<td colspan=\"4\" class=\"text-center\">There are no timesheets recorded.</td>\n\t</tr>\n\t</tbody>\n</table>\n\n<pagination :current-page.sync=\"pagination.currentPage\" :total-items=\"pagination.totalPages\" :per-page=\"pagination.perPage\" @pagination.page.changed=\"whenPaginationPageHasChanged\" v-if=\"timesheets\">\n</pagination>\n\n<modal-create-or-update-timesheet :user-id=\"userId\" :type=\"modal.type\" :title=\"modal.title\"></modal-create-or-update-timesheet>\n\n"
 if (module.hot) {(function () {  module.hot.accept()
   var hotAPI = require("vue-hot-reload-api")
   hotAPI.install(require("vue"), true)
